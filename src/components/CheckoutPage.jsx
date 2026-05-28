@@ -1,8 +1,25 @@
 import React from "react";
+import Navbar from "./Navbar";
 
-export default function CheckoutPage({ pageClass, cart, subtotal, placeOrder, showPage }) {
+export default function CheckoutPage({ pageClass, cart, subtotal, placeOrder, showPage, wishlistCount, cartQuantity, isLoggedIn, mobileOpen, setMobileOpen }) {
   return (
     <div className={pageClass('checkout')}>
+      <Navbar
+        showPage={showPage}
+        wishlistCount={wishlistCount}
+        cartQuantity={cartQuantity}
+        isLoggedIn={isLoggedIn}
+        onToggleMobile={() => setMobileOpen(prev => !prev)}
+      />
+      <div className={`mobile-menu${mobileOpen ? ' open' : ''}`} id="mobile-menu">
+        <a onClick={() => { showPage('home'); setMobileOpen(false); }}>Home</a>
+        <a onClick={() => { showPage('catalog'); setMobileOpen(false); }}>Products</a>
+        <a onClick={() => { showPage('catalog'); setMobileOpen(false); }}>Categories</a>
+        <a onClick={() => { showPage('cart'); setMobileOpen(false); }}>Cart</a>
+        <a onClick={() => { showPage('wishlist'); setMobileOpen(false); }}>Wishlist</a>
+        <a onClick={() => { showPage(isLoggedIn ? 'dashboard' : 'login'); setMobileOpen(false); }}>Dashboard</a>
+        {!isLoggedIn && <a onClick={() => { showPage('login'); setMobileOpen(false); }}>Sign In</a>}
+      </div>
       <div className="checkout-page">
         <div className="breadcrumb"><span onClick={() => showPage('home')}>Home</span><span className="sep">›</span><span onClick={() => showPage('cart')} style={{ cursor: 'pointer' }}>Cart</span><span className="sep">›</span><span>Checkout</span></div>
         <h1 style={{ marginBottom: '1.5rem' }}>Checkout</h1>

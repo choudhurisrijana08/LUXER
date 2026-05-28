@@ -250,6 +250,12 @@ export default function App() {
   }
 
   function addToCart(id) {
+    if (!isLoggedIn) {
+      showToast('❌ Please login to add items to cart');
+      setPage('login');
+      return;
+    }
+
     setCart(prev => {
       const existing = prev.find(item => item.id === id);
       if (existing) {
@@ -355,6 +361,11 @@ export default function App() {
   const detailSizesHidden = ['Electronics', 'Home', 'Books', 'Beauty'].includes(detailProduct.cat);
 
   function placeOrder() {
+    if (!isLoggedIn) {
+      showToast('❌ Please login to complete your purchase');
+      setPage('login');
+      return;
+    }
     if (cart.length === 0) {
       showToast('❌ Your cart is empty!');
       return;
@@ -426,6 +437,11 @@ export default function App() {
         resetFilters={resetFilters}
         renderProductCard={renderProductCard}
         showPage={showPage}
+        wishlistCount={wishlistCount}
+        cartQuantity={cartQuantity}
+        isLoggedIn={isLoggedIn}
+        mobileOpen={mobileOpen}
+        setMobileOpen={setMobileOpen}
       />
 
       <ProductDetail
@@ -437,6 +453,11 @@ export default function App() {
         addToCartFromDetail={addToCartFromDetail}
         addToWishlistFromDetail={addToWishlistFromDetail}
         showPage={showPage}
+        wishlistCount={wishlistCount}
+        cartQuantity={cartQuantity}
+        isLoggedIn={isLoggedIn}
+        mobileOpen={mobileOpen}
+        setMobileOpen={setMobileOpen}
       />
 
       <CartPage
@@ -450,11 +471,37 @@ export default function App() {
         updateQty={updateQty}
         removeFromCart={removeFromCart}
         showPage={showPage}
+        wishlistCount={wishlistCount}
+        cartQuantity={cartQuantity}
+        isLoggedIn={isLoggedIn}
+        mobileOpen={mobileOpen}
+        setMobileOpen={setMobileOpen}
       />
 
-      <CheckoutPage pageClass={pageClass} cart={cart} subtotal={subtotal} placeOrder={placeOrder} showPage={showPage} />
+      <CheckoutPage
+        pageClass={pageClass}
+        cart={cart}
+        subtotal={subtotal}
+        placeOrder={placeOrder}
+        showPage={showPage}
+        wishlistCount={wishlistCount}
+        cartQuantity={cartQuantity}
+        isLoggedIn={isLoggedIn}
+        mobileOpen={mobileOpen}
+        setMobileOpen={setMobileOpen}
+      />
 
-      <WishlistPage pageClass={pageClass} wishlist={wishlist} renderProductCard={renderProductCard} showPage={showPage} />
+      <WishlistPage
+        pageClass={pageClass}
+        wishlist={wishlist}
+        renderProductCard={renderProductCard}
+        showPage={showPage}
+        wishlistCount={wishlistCount}
+        cartQuantity={cartQuantity}
+        isLoggedIn={isLoggedIn}
+        mobileOpen={mobileOpen}
+        setMobileOpen={setMobileOpen}
+      />
 
       <DashboardPage
         pageClass={pageClass}
@@ -465,9 +512,21 @@ export default function App() {
         doLogout={doLogout}
         showPage={showPage}
         showToast={showToast}
+        cartQuantity={cartQuantity}
+        isLoggedIn={isLoggedIn}
+        mobileOpen={mobileOpen}
+        setMobileOpen={setMobileOpen}
       />
 
-      <SuccessPage pageClass={pageClass} showPage={showPage} />
+      <SuccessPage
+        pageClass={pageClass}
+        showPage={showPage}
+        wishlistCount={wishlistCount}
+        cartQuantity={cartQuantity}
+        isLoggedIn={isLoggedIn}
+        mobileOpen={mobileOpen}
+        setMobileOpen={setMobileOpen}
+      />
 
       <div className={`toast${toast.visible ? ' show' : ''}`} id="toast">
         <span className="toast-icon">✓</span>

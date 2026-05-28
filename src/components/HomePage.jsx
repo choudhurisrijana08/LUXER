@@ -14,11 +14,12 @@ export default function HomePage({ pageClass, showPage, mobileOpen, setMobileOpe
       />
       <div className={`mobile-menu${mobileOpen ? ' open' : ''}`} id="mobile-menu">
         <a onClick={() => { showPage('home'); setMobileOpen(false); }}>Home</a>
-        <a onClick={() => { showPage('catalog'); setMobileOpen(false); }}>Shop All</a>
+        <a onClick={() => { showPage('catalog'); setMobileOpen(false); }}>Products</a>
+        <a onClick={() => { showPage('catalog'); setMobileOpen(false); }}>Categories</a>
         <a onClick={() => { showPage('cart'); setMobileOpen(false); }}>Cart</a>
         <a onClick={() => { showPage('wishlist'); setMobileOpen(false); }}>Wishlist</a>
-        <a onClick={() => { showPage('dashboard'); setMobileOpen(false); }}>Dashboard</a>
-        <a onClick={() => { showPage('login'); setMobileOpen(false); }}>Sign In</a>
+        <a onClick={() => { showPage(isLoggedIn ? 'dashboard' : 'login'); setMobileOpen(false); }}>Dashboard</a>
+        {!isLoggedIn && <a onClick={() => { showPage('login'); setMobileOpen(false); }}>Sign In</a>}
       </div>
 
       <div className="hero">

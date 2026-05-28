@@ -1,8 +1,25 @@
 import React from "react";
+import Navbar from "./Navbar";
 
-export default function SuccessPage({ pageClass, showPage }) {
+export default function SuccessPage({ pageClass, showPage, wishlistCount, cartQuantity, isLoggedIn, mobileOpen, setMobileOpen }) {
   return (
     <div className={pageClass('success')}>
+      <Navbar
+        showPage={showPage}
+        wishlistCount={wishlistCount}
+        cartQuantity={cartQuantity}
+        isLoggedIn={isLoggedIn}
+        onToggleMobile={() => setMobileOpen(prev => !prev)}
+      />
+      <div className={`mobile-menu${mobileOpen ? ' open' : ''}`} id="mobile-menu">
+        <a onClick={() => { showPage('home'); setMobileOpen(false); }}>Home</a>
+        <a onClick={() => { showPage('catalog'); setMobileOpen(false); }}>Products</a>
+        <a onClick={() => { showPage('catalog'); setMobileOpen(false); }}>Categories</a>
+        <a onClick={() => { showPage('cart'); setMobileOpen(false); }}>Cart</a>
+        <a onClick={() => { showPage('wishlist'); setMobileOpen(false); }}>Wishlist</a>
+        <a onClick={() => { showPage(isLoggedIn ? 'dashboard' : 'login'); setMobileOpen(false); }}>Dashboard</a>
+        {!isLoggedIn && <a onClick={() => { showPage('login'); setMobileOpen(false); }}>Sign In</a>}
+      </div>
       <div className="empty-state" style={{ padding: '8rem 2rem' }}>
         <div className="empty-icon">🎉</div>
         <h3 style={{ color: 'var(--green)', fontSize: '2rem' }}>Order Placed Successfully!</h3>
