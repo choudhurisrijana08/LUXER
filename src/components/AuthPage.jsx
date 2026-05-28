@@ -1,6 +1,27 @@
 import React from "react";
 
-export default function AuthPage({ pageClass, page, showPage, doLogin, doRegister }) {
+export default function AuthPage({
+  pageClass,
+  showPage,
+  doLogin,
+  doRegister,
+  loginEmail,
+  setLoginEmail,
+  loginPassword,
+  setLoginPassword,
+  registerFirstName,
+  setRegisterFirstName,
+  registerLastName,
+  setRegisterLastName,
+  registerEmail,
+  setRegisterEmail,
+  registerPassword,
+  setRegisterPassword,
+  registerConfirmPassword,
+  setRegisterConfirmPassword,
+  agreeTerms,
+  setAgreeTerms,
+}) {
   return (
     <>
       <div className={pageClass('login')}>
@@ -17,11 +38,21 @@ export default function AuthPage({ pageClass, page, showPage, doLogin, doRegiste
               <p className="sub">Enter your credentials to continue</p>
               <div className="form-group">
                 <label>Email Address</label>
-                <input type="email" placeholder="you@example.com" id="login-email" />
+                <input
+                  type="email"
+                  placeholder="you@example.com"
+                  value={loginEmail}
+                  onChange={(e) => setLoginEmail(e.target.value)}
+                />
               </div>
               <div className="form-group">
                 <label>Password</label>
-                <input type="password" placeholder="Enter your password" id="login-pass" />
+                <input
+                  type="password"
+                  placeholder="Enter your password"
+                  value={loginPassword}
+                  onChange={(e) => setLoginPassword(e.target.value)}
+                />
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
                 <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.88rem', cursor: 'pointer' }}>
@@ -56,16 +87,31 @@ export default function AuthPage({ pageClass, page, showPage, doLogin, doRegiste
               <div className="form-row">
                 <div className="form-group">
                   <label>First Name</label>
-                  <input type="text" placeholder="John" />
+                  <input
+                    type="text"
+                    placeholder="John"
+                    value={registerFirstName}
+                    onChange={(e) => setRegisterFirstName(e.target.value)}
+                  />
                 </div>
                 <div className="form-group">
                   <label>Last Name</label>
-                  <input type="text" placeholder="Doe" />
+                  <input
+                    type="text"
+                    placeholder="Doe"
+                    value={registerLastName}
+                    onChange={(e) => setRegisterLastName(e.target.value)}
+                  />
                 </div>
               </div>
               <div className="form-group">
                 <label>Email Address</label>
-                <input type="email" placeholder="john@example.com" />
+                <input
+                  type="email"
+                  placeholder="john@example.com"
+                  value={registerEmail}
+                  onChange={(e) => setRegisterEmail(e.target.value)}
+                />
               </div>
               <div className="form-group">
                 <label>Phone Number</label>
@@ -73,15 +119,31 @@ export default function AuthPage({ pageClass, page, showPage, doLogin, doRegiste
               </div>
               <div className="form-group">
                 <label>Password</label>
-                <input type="password" placeholder="Min. 8 characters" />
+                <input
+                  type="password"
+                  placeholder="Min. 8 characters"
+                  value={registerPassword}
+                  onChange={(e) => setRegisterPassword(e.target.value)}
+                />
               </div>
               <div className="form-group">
                 <label>Confirm Password</label>
-                <input type="password" placeholder="Repeat password" />
+                <input
+                  type="password"
+                  placeholder="Repeat password"
+                  value={registerConfirmPassword}
+                  onChange={(e) => setRegisterConfirmPassword(e.target.value)}
+                />
               </div>
               <div style={{ marginBottom: '1.5rem' }}>
                 <label style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '0.85rem', cursor: 'pointer', color: 'var(--gray2)' }}>
-                  <input type="checkbox" style={{ marginTop: '3px' }} /> I agree to the <a style={{ color: 'var(--gold)' }}>Terms of Service</a> and <a style={{ color: 'var(--gold)' }}>Privacy Policy</a>
+                  <input
+                    type="checkbox"
+                    style={{ marginTop: '3px' }}
+                    checked={agreeTerms}
+                    onChange={(e) => setAgreeTerms(e.target.checked)}
+                  />
+                  I agree to the <a style={{ color: 'var(--gold)' }}>Terms of Service</a> and <a style={{ color: 'var(--gold)' }}>Privacy Policy</a>
                 </label>
               </div>
               <button className="btn btn-primary btn-full" onClick={doRegister}>Create Account</button>

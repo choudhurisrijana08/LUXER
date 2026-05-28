@@ -11,6 +11,14 @@ import WishlistPage from "./components/WishlistPage";
 import DashboardPage from "./components/DashboardPage";
 import SuccessPage from "./components/SuccessPage";
 import ProductCard from "./components/ProductCard";
+import { auth } from "./firebaseConfig";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  updateProfile,
+  onAuthStateChanged,
+} from "firebase/auth";
 
 export default function App() {
   const [page, setPage] = useState("home");
@@ -20,6 +28,14 @@ export default function App() {
   const [currentProduct, setCurrentProduct] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState({ name: 'John Doe', email: 'john@luxe.com' });
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+  const [registerFirstName, setRegisterFirstName] = useState('');
+  const [registerLastName, setRegisterLastName] = useState('');
+  const [registerEmail, setRegisterEmail] = useState('');
+  const [registerPassword, setRegisterPassword] = useState('');
+  const [registerConfirmPassword, setRegisterConfirmPassword] = useState('');
+  const [agreeTerms, setAgreeTerms] = useState(false);
   const [catFilter, setCatFilter] = useState('all');
   const [priceMin, setPriceMin] = useState('');
   const [priceMax, setPriceMax] = useState('');
@@ -88,24 +104,149 @@ export default function App() {
     setToast({ visible: true, message });
   }
 
-  function doLogin() {
-    setIsLoggedIn(true);
-    setCurrentUser({ name: 'John Doe', email: 'john@luxe.com' });
-    showToast('✓ Welcome back, John!');
-    setPage('home');
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setIsLoggedIn(true);
+        setCurrentUser({ name: user.displayName || user.email, email: user.email });
+      } else {
+        setIsLoggedIn(false);
+      }
+    });
+    return unsubscribe;
+  }, []);
+
+  async function doLogin() {
+    // Validation
+    if (!loginEmail.trim()) {
+      showToast('❌ Please enter your email');
+      return;
+    }
+    if (!loginPassword.trim()) {
+      showToast('❌ Please enter your password');
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(loginEmail)) {
+      showToast('❌ Please enter a valid email');
+      return;
+    }
+
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, loginEmail.trim(), loginPassword);
+      const user = userCredential.user;
+      setIsLoggedIn(true);
+      setCurrentUser({ name: user.displayName || user.email, email: user.email });
+      // Clear form
+      setLoginEmail('');
+      setLoginPassword('');
+      showToast('✓ Welcome back!');
+      setPage('home');
+    } catch (error) {
+      console.error(error);
+      let message = '❌ Login failed';
+      if (error.code === 'auth/user-not-found') {
+        message = '❌ Email not registered';
+      } else if (error.code === 'auth/wrong-password') {
+        message = '❌ Incorrect password';
+      } else if (error.code === 'auth/invalid-email') {
+        message = '❌ Invalid email format';
+      } else if (error.code === 'auth/user-disabled') {
+        message = '❌ Account has been disabled';
+      }
+      showToast(message);
+    }
   }
 
-  function doRegister() {
-    setIsLoggedIn(true);
-    setCurrentUser({ name: 'New User', email: 'newuser@luxe.com' });
-    showToast('🎉 Account created! Welcome to LUXE!');
-    setPage('home');
+  async function doRegister() {
+    // Validation
+    if (!registerFirstName.trim()) {
+      showToast('❌ Please enter your first name');
+      return;
+    }
+    if (!registerLastName.trim()) {
+      showToast('❌ Please enter your last name');
+      return;
+    }
+    if (!registerEmail.trim()) {
+      showToast('❌ Please enter your email');
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(registerEmail)) {
+      showToast('❌ Please enter a valid email');
+      return;
+    }
+    if (!registerPassword.trim()) {
+      showToast('❌ Please enter a password');
+      return;
+    }
+    if (registerPassword.length < 6) {
+      showToast('❌ Password must be at least 6 characters');
+      return;
+    }
+    if (registerPassword !== registerConfirmPassword) {
+      showToast('❌ Passwords do not match');
+      return;
+    }
+    if (!agreeTerms) {
+      showToast('❌ Please agree to the terms and conditions');
+      return;
+    }
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, registerEmail.trim(), registerPassword);
+      await updateProfile(userCredential.user, {
+        displayName: `${registerFirstName.trim()} ${registerLastName.trim()}`.trim(),
+      });
+      const user = auth.currentUser;
+      setIsLoggedIn(true);
+      setCurrentUser({ name: user.displayName || user.email, email: user.email });
+      
+      // Clear form fields
+      setRegisterFirstName('');
+      setRegisterLastName('');
+      setRegisterEmail('');
+      setRegisterPassword('');
+      setRegisterConfirmPassword('');
+      setAgreeTerms(false);
+      
+      showToast('🎉 Account created successfully!');
+      setPage('home');
+    } catch (error) {
+      console.error(error);
+      let message = '❌ Registration failed';
+      if (error.code === 'auth/email-already-in-use') {
+        message = '❌ Email already registered';
+      } else if (error.code === 'auth/invalid-email') {
+        message = '❌ Invalid email format';
+      } else if (error.code === 'auth/weak-password') {
+        message = '❌ Password is too weak (min 6 characters)';
+      } else if (error.code === 'auth/operation-not-allowed') {
+        message = '❌ Registration is currently disabled';
+      }
+      showToast(message);
+    }
   }
 
-  function doLogout() {
-    setIsLoggedIn(false);
-    showToast('👋 Signed out successfully');
-    setPage('home');
+  async function doLogout() {
+    try {
+      await signOut(auth);
+      setIsLoggedIn(false);
+      setCurrentUser({ name: '', email: '' });
+      // Clear form fields on logout
+      setLoginEmail('');
+      setLoginPassword('');
+      setRegisterFirstName('');
+      setRegisterLastName('');
+      setRegisterEmail('');
+      setRegisterPassword('');
+      setRegisterConfirmPassword('');
+      setAgreeTerms(false);
+      showToast('👋 Signed out successfully');
+      setPage('home');
+    } catch (error) {
+      console.error(error);
+      showToast('❌ Logout failed');
+    }
   }
 
   function addToCart(id) {
@@ -240,7 +381,28 @@ export default function App() {
         showProduct={showProduct}
       />
 
-      <AuthPage pageClass={pageClass} showPage={showPage} doLogin={doLogin} doRegister={doRegister} />
+      <AuthPage
+        pageClass={pageClass}
+        showPage={showPage}
+        doLogin={doLogin}
+        doRegister={doRegister}
+        loginEmail={loginEmail}
+        setLoginEmail={setLoginEmail}
+        loginPassword={loginPassword}
+        setLoginPassword={setLoginPassword}
+        registerFirstName={registerFirstName}
+        setRegisterFirstName={setRegisterFirstName}
+        registerLastName={registerLastName}
+        setRegisterLastName={setRegisterLastName}
+        registerEmail={registerEmail}
+        setRegisterEmail={setRegisterEmail}
+        registerPassword={registerPassword}
+        setRegisterPassword={setRegisterPassword}
+        registerConfirmPassword={registerConfirmPassword}
+        setRegisterConfirmPassword={setRegisterConfirmPassword}
+        agreeTerms={agreeTerms}
+        setAgreeTerms={setAgreeTerms}
+      />
 
       <CatalogPage
         pageClass={pageClass}
